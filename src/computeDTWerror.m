@@ -6,14 +6,12 @@ function error = computeDTWerror( Aerr, u, lag0 )
 % USAGE: function error = computeDTWerror( Aerr, u, lag0 )
 %
 % INPUT:
-%   Aerr = error MATRIX from err_diw (equation 13 in Hale, 2013)
+%   Aerr = error MATRIX (equation 13 in Hale, 2013)
 %   u    = warping function (samples) VECTOR
 %   lag0 = value of maximum lag (samples) SCALAR
 %
-%   See also ERR_DIW.
-%
 % Written by Dylan Mikesell
-% Last modified: 21 August 2014
+% Last modified: 25 February 2015
 
 npts = numel(u);
 
@@ -26,10 +24,8 @@ error = 0; % initialize
 
 % accumulate error
 for ii = 1:npts
-    error = error + Aerr( ii, u(ii) + (lag0+1) );
+    idx = lag0 + 1 + u(ii); % index of lag
+    error = error + Aerr( ii, idx ); % sum error
 end
-
-% NOTE: Aerr is computed as the squared difference between points in
-% the trace. See err_diw.m for more on this error function
 
 return

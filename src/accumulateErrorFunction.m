@@ -14,7 +14,7 @@ function d = accumulateErrorFunction( dir, err, nSample, lag, b )
 % The function is equation 6 in Hale, 2013.
 %
 % Original by Di Yang
-% Last modified by Dylan Mikesell (19 Dec. 2014)
+% Last modified by Dylan Mikesell (25 Feb. 2015)
 
 nLag = ( 2 * lag ) + 1; % number of lags from [ -lag : +lag ]
 
@@ -37,9 +37,9 @@ end
 % Loop through all times ii in forward or backward direction
 for ii = iBegin : iInc : iEnd
     
-    ji = max( 1, min( nSample, ii - iInc ) ); % current index i
-    
-    jb = max( 1, min( nSample, ii - iInc * b ) ); % current lag is*b
+    % min/max to account for the edges/boundaries
+    ji = max( 1, min( nSample, ii - iInc ) );     % i-1 index
+    jb = max( 1, min( nSample, ii - iInc * b ) ); % i-b index
     
     % loop through all lags l
     for ll = 1 : nLag
@@ -61,18 +61,18 @@ for ii = iBegin : iInc : iEnd
         % -----------------------------------------------------------------
 
         % get distance at lags (ll-1, ll, ll+1)
-        distLminus1 = d( jb, lMinus1 ); % minus
-        distL       = d( ji, ll );      % actual
-        distLplus1  = d( jb, lPlus1 );  % plus
+        distLminus1 = d( jb, lMinus1 ); % minus:  d( i-b, j-1 )
+        distL       = d( ji, ll );      % actual: d( i-1, j   )
+        distLplus1  = d( jb, lPlus1 );  % plus:   d( i-b, j+1 )
         
-        if (ji ~= jb)
-            for kb = ji : -iInc : jb + iInc     
+        if (ji ~= jb) % equation 10 in Hale (2013)
+            for kb = ji : -iInc : jb + iInc % sum errors over i-1:i-b+1   
                 distLminus1 = distLminus1 + err( kb, lMinus1 );
                 distLplus1  = distLplus1  + err( kb, lPlus1  );
             end
         end
         
-        % equation 6 in Hale (2013) after treating boundaries
+        % equation 6 (if b=1) or 10 (if b>1) in Hale (2013) after treating boundaries
         d( ii, ll ) = err( ii, ll ) + min( [ distLminus1, distL, distLplus1 ] ); 
     end
 end
