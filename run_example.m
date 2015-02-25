@@ -80,18 +80,30 @@ stbar = backtrackDistanceFunction( -1*direction, dist, err, -maxLag, b ); % find
 stbarTime = stbar .* dt;      % convert from samples to time
 tvec2     = tvec + stbarTime; % make the warped time axis
 
-figure;
+% make figure
+h = figure('Color','White'); set(h,'PaperUnits','Inches');
+set(h, 'PaperPositionMode','Auto');
+set(h, 'Units', 'Inches','Position',[1 1 10 10]);
+
 % plot the distance function
 subplot(2,1,1);
 imagesc(tvec,lvec,dist');
+haxes1 = gca;
 title('Distance function'); c=colorbar; axis('tight'); axis xy;
 xlabel('Time [s]'); ylabel('\tau [s]');
 % plot real shifts against estimated shifts
 subplot(2,1,2);
 plot(tvec,stTime,'ko'); hold on;
-plot(tvec,stbarTime,'r+'); legend('Actual','Estimated'); legend boxoff;
+plot(tvec,stbarTime,'r+'); 
+haxes2 = gca;
+legend('Actual','Estimated'); legend boxoff;
 title('Estimated shifts');
 xlabel('Time [s]'); ylabel('\tau [s]');
+
+pos1 = haxes1.Position;
+pos2 = haxes2.Position;
+set(haxes2,'Position',[pos2(1) pos2(2) pos1(3) pos1(4)]);
+print(h,'-dpng','SINEdistance.png');
 
 figure;
 % plot input traces
